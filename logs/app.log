@@ -1,0 +1,28 @@
+2026-04-16 16:28:09,269 - INFO - ----- NEW EMAIL THREAD -----
+2026-04-16 16:28:09,269 - INFO - From: Rucha Vaikar <ruchavaikar@gmail.com>
+2026-04-16 16:28:09,269 - INFO - Subject: 
+2026-04-16 16:28:09,269 - INFO - Keyword RFQ detected: True
+2026-04-16 16:28:09,269 - INFO - Status: Passed basic filter
+2026-04-16 16:28:09,269 - INFO - Sending email to AI classifier
+2026-04-16 16:28:12,962 - INFO - AI classification result: RFQ
+2026-04-16 16:28:12,962 - INFO - Status: RFQ detected - creating draft
+2026-04-16 16:28:13,640 - INFO - Draft created (testing mode)
+2026-04-16 16:28:14,366 - INFO - Draft created and thread labeled
+2026-04-16 16:28:14,383 - INFO - Skipping thread already handled by team
+2026-04-16 16:28:14,383 - INFO - Skipping thread already handled by team
+2026-04-16 16:28:14,384 - INFO - Skipping thread already handled by team
+2026-04-16 16:28:14,384 - INFO - Skipping thread already handled by team
+2026-04-16 16:28:14,396 - INFO - Skipping already processed email
+2026-04-16 16:28:14,397 - INFO - Skipping thread already handled by team
+2026-04-16 16:28:14,397 - INFO - Skipping thread already handled by team
+2026-04-16 16:28:14,398 - INFO - Skipping thread already handled by team
+2026-04-16 16:28:14,398 - INFO - Skipping thread already handled by team
+2026-04-16 16:28:14,399 - INFO - Skipping thread already handled by team
+2026-04-16 16:28:14,399 - INFO - Skipping thread already handled by team
+2026-04-16 16:28:14,400 - INFO - Skipping thread already handled by team
+2026-04-16 16:28:14,400 - INFO - ========== DAILY SUMMARY ==========
+2026-04-16 16:28:14,400 - INFO - Total emails fetched: 13
+2026-04-16 16:28:14,401 - INFO - Ignored emails: 0
+2026-04-16 16:28:14,401 - INFO - Emails for AI processing: 1
+2026-04-16 16:28:14,401 - INFO - RFQ emails detected: 1
+2026-04-16 16:28:14,401 - INFO - ===================================
