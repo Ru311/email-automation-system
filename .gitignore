@@ -1,0 +1,23 @@
+# =============================================================================
+# .gitignore — Files that must NEVER be committed to version control
+# =============================================================================
+
+# ── Secrets & credentials ─────────────────────────────────────────────────
+.env                    # API keys and environment variables
+token.json              # Gmail OAuth token (grants full account access)
+credentials.json        # Google OAuth client secrets
+
+# ── Python environment ────────────────────────────────────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ── Runtime data ──────────────────────────────────────────────────────────
+logs/
+data/
+
+# ── macOS system files ────────────────────────────────────────────────────
+.DS_Store
+.env
+.env

@@ -1,0 +1,24 @@
+# =============================================================
+# requirements.txt — Python dependencies for email-automation-system
+# =============================================================
+# Install with:
+#   source .venv/bin/activate
+#   pip install -r requirements.txt
+# =============================================================
+
+# Google Gmail API + OAuth
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+
+# Gemini AI SDK
+google-genai
+
+# HTML parsing (used in parse_email.py to strip HTML bodies)
+beautifulsoup4
+
+# Scheduled job runner (used in scheduler.py)
+schedule
+
+# Load secrets from .env file (keeps API keys out of source code)
+python-dotenv
