@@ -55,7 +55,7 @@ TEAM_CC_EMAIL = [
     "sales1@themarketinghouse.in"
     # "girish.vaikar@themarketinghouse.in",
 ]
-DRY_RUN = True
+DRY_RUN = False
 # ---------------------------------------------------------------------------
 # Domain filtering
 # ---------------------------------------------------------------------------

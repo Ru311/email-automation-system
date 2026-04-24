@@ -1,3 +1,6 @@
+import threading
+import traceback
+
 from gmail import forward_email
 from gmail.auth import get_gmail_service
 from gmail.fetch_emails import fetch_last_day_emails
@@ -18,6 +21,13 @@ from utils.email_participants import merge_cc
 from config import USE_AI_CLASSIFICATION
 from gmail.forward_email import forward_email
 import time
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+job_lock = threading.Lock()
+job_state = {
+    "running": False,
+}
 
 def main():
 
@@ -249,6 +259,46 @@ def main():
     logger.info(f"RFQ emails detected: {rfq_count}")
     logger.info("===================================")
 
+
+def _run_main_in_background():
+    try:
+        logger.info("[TRIGGER] Background automation job started")
+        main()
+        logger.info("[TRIGGER] Background automation job completed")
+    except Exception:
+        logger.error("[TRIGGER] Background automation job failed")
+        logger.error(traceback.format_exc())
+    finally:
+        with job_lock:
+            job_state["running"] = False
+
+
+def start_background_job():
+    with job_lock:
+        if job_state["running"]:
+            return False
+
+        job_state["running"] = True
+
+    worker = threading.Thread(target=_run_main_in_background, daemon=True)
+    worker.start()
+    return True
+
+
+@app.route("/", methods=["GET"])
+def run():
+    started = start_background_job()
+
+    if started:
+        return jsonify({
+            "status": "accepted",
+            "message": "Automation triggered successfully. Processing continues in background.",
+        }), 202
+
+    return jsonify({
+        "status": "already_running",
+        "message": "Automation is already processing in background.",
+    }), 202
 
 if __name__ == "__main__":
     main()

@@ -4,10 +4,10 @@ import time
 
 def fetch_last_day_emails(service):
 
-    twenty_four_hours_ago = int(time.time()) - 86400
+    five_minutes_ago = int(time.time()) - 300
 
     query = f"""
-        after:{twenty_four_hours_ago}
+        after:{five_minutes_ago}
         -category:promotions
         -category:social
         -category:updates

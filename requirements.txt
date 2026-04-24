@@ -22,3 +22,8 @@ schedule
 
 # Load secrets from .env file (keeps API keys out of source code)
 python-dotenv
+
+google-auth
+google-generativeai
+flask
+gunicorn
