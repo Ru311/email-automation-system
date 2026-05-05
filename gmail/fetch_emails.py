@@ -4,17 +4,17 @@ import time
 
 def fetch_last_day_emails(service):
 
-    five_minutes_ago = int(time.time()) - 300
+    one_minutes_ago = int(time.time()) - 60
 
     query = f"""
-        after:{five_minutes_ago}
+        after:{one_minutes_ago}
         -category:promotions
         -category:social
         -category:updates
         -from:noreply
         -from:no-reply
         """
-   
+    # query = "subject:AP2911// (RFQ) – PCB Fabrication newer_than:7d"
     results = service.users().messages().list(
             userId="me",
             q=query

@@ -17,9 +17,6 @@ google-genai
 # HTML parsing (used in parse_email.py to strip HTML bodies)
 beautifulsoup4
 
-# Scheduled job runner (used in scheduler.py)
-schedule
-
 # Load secrets from .env file (keeps API keys out of source code)
 python-dotenv
 

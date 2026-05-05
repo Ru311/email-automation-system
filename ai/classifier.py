@@ -1,11 +1,11 @@
 from google import genai
-import time
 import json
+import time
 from config import GEMINI_API_KEY
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 
-def classify_email(email_text):
+def classify_email(email_text: str) -> dict:
 
     prompt = f"""
             You are a highly strict email classifier for a manufacturing company.
@@ -83,7 +83,7 @@ def classify_email(email_text):
             {{
             "is_rfq": true/false,
             "confidence": 0.0 to 1.0,
-            "reason": "short explanation",
+            "reason": "detailed explanation with evidence from the mail, give exact content",
             "sender_name": "string or null"
             }}
 
@@ -96,7 +96,6 @@ def classify_email(email_text):
     max_retries = 5
 
     for attempt in range(max_retries):
-
         try:
             response = client.models.generate_content(
                 model="gemini-2.5-flash",
@@ -104,7 +103,7 @@ def classify_email(email_text):
             )
             text = response.text.strip()
 
-            # 🔥 Clean possible markdown
+            # Clean possible markdown formatting around JSON.
             if text.startswith("```"):
                 text = text.strip("```").replace("json", "").strip()
 
@@ -118,10 +117,14 @@ def classify_email(email_text):
             }
 
         except Exception as e:
+            # Retry transient failures; return a safe "not RFQ" result if all retries fail.
+            if attempt < max_retries - 1:
+                time.sleep(0.5 * (attempt + 1))
+                continue
+
             return {
                 "is_rfq": False,
                 "confidence": 0.0,
                 "reason": f"AI parsing error: {str(e)}",
-                "sender_name":"null"
+                "sender_name": None,
             }
-
