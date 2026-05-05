@@ -14,7 +14,7 @@ def fetch_last_day_emails(service):
         -from:noreply
         -from:no-reply
         """
-    # query = "subject:AP2911// (RFQ) – PCB Fabrication newer_than:7d"
+   
     results = service.users().messages().list(
             userId="me",
             q=query
