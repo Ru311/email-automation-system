@@ -126,6 +126,8 @@ def parse_email(service, message_id):
     sender = ""
     to_emails = ""
     cc_emails = ""
+    message_id_header = ""
+    references_header = ""
 
     for h in headers:
 
@@ -141,6 +143,12 @@ def parse_email(service, message_id):
         if h["name"].lower() == "cc":
             cc_emails = h["value"]
 
+        if h["name"].lower() == "message-id":
+            message_id_header = h["value"]
+
+        if h["name"].lower() == "references":
+            references_header = h["value"]
+
     body = extract_body(msg['payload'])
 
     return {
@@ -148,5 +156,8 @@ def parse_email(service, message_id):
         "sender": sender,
         "body": body,
         "to": to_emails,
-        "cc": cc_emails
+        "cc": cc_emails,
+        "message_id": message_id_header,
+        "references": references_header,
+        "gmail_id": msg.get("id", message_id),
     }

@@ -39,10 +39,9 @@ def classify_email(email_text: str) -> dict:
             ---
 
             ### Mark as NOT_RFQ if ANY of these apply:
-            - Reply to an existing thread
             - Thanking for a quote
+            - Reminding about past requests
             - Sending PO, invoice, payment, or confirmation
-            - Asking for updates like "any update?", "status?"
             - General inquiry without asking price
             - Internal email
             - Vendor communication
