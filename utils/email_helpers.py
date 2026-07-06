@@ -9,6 +9,9 @@ def is_internal_email(sender, company_domains):
 
     sender = sender.lower()
 
+    if sender == "sales.north@themarketinghouse.in":
+        return False
+
     for domain in company_domains:
         if domain in sender:
             return True

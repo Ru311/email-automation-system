@@ -62,6 +62,8 @@ def forward_email(service, message_id, sender_name):
     # CC → original CC + your team
     cc_list = []
 
+    if original_to:
+        cc_list.append(original_to)
     if original_cc:
         cc_list.append(original_cc)
 
@@ -71,7 +73,7 @@ def forward_email(service, message_id, sender_name):
         cc_list.append(TEAM_CC_EMAIL)
 
     cc_list = [c for c in cc_list if c]
-    cc_email = ", ".join(cc_list)
+    cc_email = ", ".join(c for c in cc_list if c and 'girish.vaikar@themarketinghouse.in' not in c.lower())
 
     # =========================
     # STEP 5: CREATE EMAIL

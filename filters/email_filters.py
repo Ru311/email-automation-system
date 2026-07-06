@@ -8,6 +8,7 @@ def should_ignore(email_text):
     for word in IGNORE_KEYWORDS:
 
         if word in email_text:
+            print(word)
             return True
 
     return False

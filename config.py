@@ -74,9 +74,6 @@ COMPANY_DOMAINS = [
 # Emails whose body matches ANY of these keywords are immediately ignored
 # (finance noise, newsletters, automated notifications, etc.)
 IGNORE_KEYWORDS = [
-    "invoice",
-    "payment",
-    "bank",
     "statement",
     "newsletter",
     "unsubscribe",
@@ -85,8 +82,7 @@ IGNORE_KEYWORDS = [
     "do not reply",
     "password",
     "OTP",
-    "tracking",
-    "shipment",
+    "tracking"
 ]
 
 # Keywords that indicate the email is (or contains) a Request for Quotation.

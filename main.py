@@ -7,6 +7,7 @@ from flask import Flask, jsonify
 
 from ai.classifier import classify_email
 from config import COMPANY_DOMAINS, USE_AI_CLASSIFICATION
+from databse.insert_msg_id import mark_processed
 from filters.email_filters import contains_rfq_keywords, should_ignore
 from gmail.auth import get_gmail_service
 from gmail.fetch_emails import fetch_last_day_emails
@@ -71,6 +72,12 @@ def main() -> None:
 
         message_id = msg["id"]
 
+        inserted = mark_processed(message_id, thread_id)
+
+        if not inserted:
+            logger.info("[SKIP] Already processed")
+            continue
+
         if is_processed(message_id):
             logger.info("[SKIP] Already processed")
             continue
@@ -87,9 +94,12 @@ def main() -> None:
         context = format_email_context(subject, sender_email)
 
         if thread_length != 1:
-            logger.info(f"[SKIP] thread length - {thread_length} :: {context}")
-            save_processed_thread(thread_id)
-            continue
+            if(subject == "CMP PCB - Your Trusted PCB Partner" and thread_length < 3):
+                logger.info(f"[INFO] Thread with Exhbition :: {context}")
+            else:
+                logger.info(f"[SKIP] thread length - {thread_length} :: {context}")
+                save_processed_thread(thread_id)
+                continue
 
         if is_internal_email(sender_email, COMPANY_DOMAINS):
             logger.info(f"[SKIP] Internal email :: {context}")
@@ -97,6 +107,7 @@ def main() -> None:
             continue
 
         if should_ignore(body):
+            logger.info({body})
             logger.info(f"[SKIP]: Finance/newsletter :: {context})")
             save_processed_email(message_id)
             continue
