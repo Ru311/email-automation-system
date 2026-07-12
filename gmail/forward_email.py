@@ -1,4 +1,8 @@
+from utils.logger import logger
+
+
 def forward_email(service, message_id, sender_name):
+    """Forward a message while preserving the original content and attachments."""
 
     import base64
     from email import message_from_bytes
@@ -178,11 +182,13 @@ def forward_email(service, message_id, sender_name):
     # STEP 8: DRY RUN SAFETY
     # =========================
     if DRY_RUN:
+        logger.info("Creating draft for forwarded message")
         return service.users().drafts().create(
             userId="me",
             body={"message": {"raw": raw}}
         ).execute()
     else:
+        logger.info("Sending forwarded message")
         return service.users().messages().send(
             userId="me",
             body={"raw": raw}

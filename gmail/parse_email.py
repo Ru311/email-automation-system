@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 
 
 def extract_body(payload):
+    """Extract the first readable text body from a Gmail payload."""
 
     body = ""
 
@@ -12,7 +13,6 @@ def extract_body(payload):
 
             mime = part.get("mimeType", "")
 
-            # plain text
             if mime == "text/plain":
 
                 data = part["body"].get("data")
@@ -21,7 +21,6 @@ def extract_body(payload):
                     body = base64.urlsafe_b64decode(data).decode(errors="ignore")
                     return body
 
-            # html fallback
             if mime == "text/html":
 
                 data = part["body"].get("data")
@@ -32,7 +31,6 @@ def extract_body(payload):
                     body = soup.get_text()
                     return body
 
-            # recursive search
             if "parts" in part:
                 body = extract_body(part)
 
@@ -49,6 +47,7 @@ def extract_body(payload):
     return body
 
 def parse_thread(service, thread_id):
+    """Parse all usable messages from a Gmail thread."""
 
     thread = service.users().threads().get(
         userId="me",
@@ -72,7 +71,6 @@ def parse_thread(service, thread_id):
         message_id_header = ""
         references_header = ""
 
-        # 🔍 Extract headers
         for h in headers:
             name = h["name"].lower()
             value = h["value"]
@@ -90,11 +88,9 @@ def parse_thread(service, thread_id):
             elif name == "references":
                 references_header = value
 
-        # ⚠️ Skip if no message-id (cannot reply properly)
         if not message_id_header:
             continue
 
-        # 📩 Extract body
         body = extract_body(message['payload'])
         if not body:
             continue
@@ -113,6 +109,7 @@ def parse_thread(service, thread_id):
     return conversation
 
 def parse_email(service, message_id):
+    """Parse a single Gmail message into the normalized email structure."""
 
     msg = service.users().messages().get(
         userId="me",

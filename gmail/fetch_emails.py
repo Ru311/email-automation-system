@@ -1,8 +1,8 @@
-from datetime import datetime, timedelta
 import time
 
 
 def fetch_last_day_emails(service):
+    """Fetch inbox messages from roughly the last minute."""
 
     one_minutes_ago = int(time.time()) - 60
 

@@ -1,14 +1,11 @@
-import logging
-import sys
 import threading
-import traceback
 
 from flask import Flask, jsonify
 
 from ai.classifier import classify_email
 from config import COMPANY_DOMAINS, USE_AI_CLASSIFICATION
 from databse.insert_msg_id import mark_processed
-from filters.email_filters import contains_rfq_keywords, should_ignore
+from filters.email_filters import should_ignore
 from gmail.auth import get_gmail_service
 from gmail.fetch_emails import fetch_last_day_emails
 from gmail.forward_email import forward_email
@@ -18,20 +15,12 @@ from utils.email_helpers import (
     clean_name,
     extract_name,
     format_email_context,
-    get_latest_message,
     is_internal_email,
 )
 from utils.email_tracker import is_processed, save_processed_email
-from utils.thread_formatter import format_email_for_ai, format_thread_for_ai
+from utils.thread_formatter import format_email_for_ai
 from utils.thread_tracker import is_thread_processed, save_processed_thread
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)]
-)
-
-logger = logging.getLogger(__name__)
+from utils.logger import logger
 
 app = Flask(__name__)
 job_lock = threading.Lock()
@@ -44,21 +33,21 @@ REVIEW_LABEL_NAME = "REVIEW_NEEDED"
 
 
 def _get_sender_name(*, ai_sender_name: str | None, sender_email: str) -> str:
+    """Return the best available display name for a sender."""
     name = clean_name(ai_sender_name)
     if name:
         return name
 
-    # When AI classification is disabled (or doesn't provide a name), fall back to
-    # parsing the display name from the sender header.
     parsed = clean_name(extract_name(sender_email))
     return parsed or "Sir"
 
 
 def main() -> None:
+    """Process recent inbox emails and apply the RFQ workflow."""
 
     service = get_gmail_service()
     messages = fetch_last_day_emails(service)
-    
+
     logger.info("Found %s emails", len(messages))
     processed_label_id = get_or_create_label(service, PROCESSED_LABEL_NAME)
     review_label_id = get_or_create_label(service, REVIEW_LABEL_NAME)
@@ -85,7 +74,6 @@ def main() -> None:
         conversation = parse_thread(service, thread_id)
         email = parse_email(service, message_id)
         thread_length = len(conversation)
-        # latest_email = conversation[-1]
         subject = email["subject"]
         body = email["body"]
         sender_email = email["sender"]
@@ -94,30 +82,30 @@ def main() -> None:
         context = format_email_context(subject, sender_email)
 
         if thread_length != 1:
-            if(subject == "CMP PCB - Your Trusted PCB Partner" and thread_length < 3):
-                logger.info(f"[INFO] Thread with Exhbition :: {context}")
+            if subject == "CMP PCB - Your Trusted PCB Partner" and thread_length < 3:
+                logger.info("[INFO] Thread with Exhbition :: %s", context)
             else:
-                logger.info(f"[SKIP] thread length - {thread_length} :: {context}")
+                logger.info("[SKIP] thread length - %s :: %s", thread_length, context)
                 save_processed_thread(thread_id)
                 continue
 
         if is_internal_email(sender_email, COMPANY_DOMAINS):
-            logger.info(f"[SKIP] Internal email :: {context}")
+            logger.info("[SKIP] Internal email :: %s", context)
             save_processed_email(message_id)
             continue
 
         if should_ignore(body):
-            logger.info({body})
-            logger.info(f"[SKIP]: Finance/newsletter :: {context})")
+            logger.info("%s", body)
+            logger.info("[SKIP]: Finance/newsletter :: %s", context)
             save_processed_email(message_id)
             continue
 
         logger.info("----------------------------------------------")
-        logger.info(f"[PROCESSED]: Passed basic filter :: {context}")
-        
+        logger.info("[PROCESSED]: Passed basic filter :: %s", context)
+
         ai_result = None
         if USE_AI_CLASSIFICATION:
-            logger.info(f"{context} [AI] Sending email to classifier")
+            logger.info("%s [AI] Sending email to classifier", context)
 
             email_text = format_email_for_ai(email)
             ai_result = classify_email(email_text)
@@ -125,22 +113,22 @@ def main() -> None:
             is_rfq = ai_result["is_rfq"]
             ai_reason = ai_result["reason"]
 
-            logger.info(
-                f"{context} [AI] RFQ={is_rfq} | Reason={ai_reason}"
-            )
-
+            logger.info("%s [AI] RFQ=%s | Reason=%s", context, is_rfq, ai_reason)
 
         if not is_rfq:
-            logger.info(f"{context} [FAIL] Not an RFQ email")
+            logger.info("%s [FAIL] Not an RFQ email", context)
             logger.info("----------------------------------------------")
             save_processed_email(message_id)
             continue
-        logger.info(f"{context} [PASS] RFQ detected → forwarding for review")
+        logger.info("%s [PASS] RFQ detected -> forwarding for review", context)
 
         ai_sender_name = None
         if USE_AI_CLASSIFICATION:
             ai_sender_name = ai_result.get("sender_name") if ai_result else None
-        sender_name = _get_sender_name(ai_sender_name=ai_sender_name, sender_email=sender_email)
+        sender_name = _get_sender_name(
+            ai_sender_name=ai_sender_name,
+            sender_email=sender_email,
+        )
 
 
         logger.info("[THREAD DEBUG] ThreadID=%s In-Reply-To=%s", thread_id, original_message_id)
@@ -156,17 +144,12 @@ def main() -> None:
         logger.info("Thread labeled and marked processed")
         logger.info("----------------------------------------------")
         save_processed_email(message_id)
-    
-
 
 def _run_main_in_background():
     try:
-        # logger.info("[TRIGGER] Background automation job started")
         main()
-        # logger.info("[TRIGGER] Background automation job completed")
     except Exception:
-        logger.error("[TRIGGER] Background automation job failed")
-        logger.error(traceback.format_exc())
+        logger.error("Automation failed")
     finally:
         with job_lock:
             job_state["running"] = False
@@ -186,7 +169,7 @@ def start_background_job():
 
 @app.route("/", methods=["GET"])
 def run():
-    # logger.info("Scheduler triggered (HTTP request received)")
+    """Run the email processing job once via HTTP."""
     started = start_background_job()
 
     if started:

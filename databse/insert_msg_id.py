@@ -2,6 +2,7 @@ from sqlalchemy import text
 from .database_helper import engine
 
 def mark_processed(message_id, thread_id):
+    """Insert a processed message record if it does not already exist."""
 
     with engine.connect() as conn:
         result = conn.execute(

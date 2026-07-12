@@ -5,6 +5,7 @@ FILE_PATH = "data/processed_emails.json"
 
 
 def load_processed_emails():
+    """Load the list of processed email IDs from disk."""
 
     if not os.path.exists(FILE_PATH):
         return []
@@ -18,6 +19,7 @@ def load_processed_emails():
 
 
 def save_processed_email(email_id):
+    """Persist an email ID as processed."""
 
     processed = load_processed_emails()
 
@@ -28,6 +30,7 @@ def save_processed_email(email_id):
 
 
 def is_processed(email_id):
+    """Return True when the email has already been processed."""
 
     processed = load_processed_emails()
 

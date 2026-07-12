@@ -7,17 +7,16 @@ from config import SCOPES
 
 
 def get_gmail_service():
+    """Build an authenticated Gmail API client."""
 
     creds = None
 
     if os.path.exists("token.json"):
         creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 
-    # Refresh token automatically
     if creds and creds.expired and creds.refresh_token:
         creds.refresh(Request())
 
-    # If no credentials available
     if not creds or not creds.valid:
         flow = InstalledAppFlow.from_client_secrets_file(
             "credentials.json",

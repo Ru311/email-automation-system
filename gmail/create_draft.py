@@ -7,6 +7,7 @@ import base64
 
 def create_draft(service, to_email, subject, body, thread_id,
                  cc_email, original_message_id, reference, attachments):
+    """Create a reply draft with optional attachments."""
 
     message = MIMEMultipart()
 
@@ -20,10 +21,8 @@ def create_draft(service, to_email, subject, body, thread_id,
     message["In-Reply-To"] = original_message_id
     message["References"] = reference
 
-    # ✅ Body
     message.attach(MIMEText(body, "plain"))
 
-    # ✅ Attach files
     for att in attachments:
         part = MIMEBase("application", "octet-stream")
         part.set_payload(base64.urlsafe_b64decode(att["data"]))

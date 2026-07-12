@@ -1,4 +1,5 @@
 def get_or_create_label(service, label_name):
+    """Return the Gmail label ID for `label_name`, creating it if needed."""
 
     labels = service.users().labels().list(userId="me").execute()
 
@@ -20,6 +21,7 @@ def get_or_create_label(service, label_name):
     return label["id"]
 
 def label_thread(service, thread_id, label_id):
+    """Apply a label to the specified Gmail thread."""
 
     service.users().threads().modify(
         userId="me",

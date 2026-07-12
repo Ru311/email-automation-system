@@ -2,10 +2,12 @@ from google import genai
 import json
 import time
 from config import GEMINI_API_KEY
+from utils.logger import logger
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 def classify_email(email_text: str) -> dict:
+    """Classify an email as RFQ or not and extract a sender name."""
 
     prompt = f"""
             You are a highly strict email classifier for a manufacturing company.
@@ -102,7 +104,6 @@ def classify_email(email_text: str) -> dict:
             )
             text = response.text.strip()
 
-            # Clean possible markdown formatting around JSON.
             if text.startswith("```"):
                 text = text.strip("```").replace("json", "").strip()
 
@@ -116,11 +117,11 @@ def classify_email(email_text: str) -> dict:
             }
 
         except Exception as e:
-            # Retry transient failures; return a safe "not RFQ" result if all retries fail.
             if attempt < max_retries - 1:
                 time.sleep(0.5 * (attempt + 1))
                 continue
 
+            logger.exception("AI classification failed after %s attempts", max_retries)
             return {
                 "is_rfq": False,
                 "confidence": 0.0,

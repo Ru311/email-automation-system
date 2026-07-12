@@ -1,4 +1,5 @@
 def extract_name(sender):
+    """Extract the display name from a formatted sender string."""
 
     if "<" in sender:
         return sender.split("<")[0].strip()
@@ -6,6 +7,7 @@ def extract_name(sender):
     return sender   
 
 def is_internal_email(sender, company_domains):
+    """Return True when the sender belongs to one of the company domains."""
 
     sender = sender.lower()
 
@@ -19,18 +21,21 @@ def is_internal_email(sender, company_domains):
     return False
 
 def format_email_context(subject, sender):
+    """Build a compact log context for an email."""
+
     subject = subject.replace("\n", " ").strip()
     if len(subject) > 60:
         subject = subject[:57] + "..."
     return f"[#[{sender}] [{subject}]"
 
 def clean_name(name):
+    """Normalize a candidate sender name and reject obvious noise."""
+
     if not name:
         return None
 
     name = name.strip()
 
-    # reject garbage
     if "@" in name:
         return None
     if len(name) > 40:
@@ -46,11 +51,15 @@ def clean_name(name):
     return None
 
 def get_latest_message(conversation):
+    """Return the last message in a conversation, if any."""
+
     if not conversation:
         return None
     return conversation[-1]
 
 def extract_attachments(service, message):
+    """Fetch attachment payloads for a Gmail message."""
+
     attachments = []
 
     payload = message.get("payload", {})

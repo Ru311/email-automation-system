@@ -3,6 +3,7 @@ from email.mime.text import MIMEText
 
 
 def send_reply(service, to_email, subject, body, thread_id, cc_email, original_message_id, reference):
+    """Send a reply in the existing Gmail thread."""
 
     message = MIMEText(body)
 

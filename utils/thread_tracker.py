@@ -5,6 +5,7 @@ FILE_PATH = "data/processed_threads.json"
 
 
 def load_processed_threads():
+    """Load the list of processed thread IDs from disk."""
 
     if not os.path.exists(FILE_PATH):
         return []
@@ -17,6 +18,7 @@ def load_processed_threads():
 
 
 def is_thread_processed(thread_id):
+    """Return True when the thread has already been processed."""
 
     processed = load_processed_threads()
 
@@ -24,6 +26,7 @@ def is_thread_processed(thread_id):
 
 
 def save_processed_thread(thread_id):
+    """Persist a thread ID as processed."""
 
     processed = load_processed_threads()
 

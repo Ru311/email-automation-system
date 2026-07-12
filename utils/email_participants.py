@@ -1,4 +1,5 @@
 def merge_cc(original_cc, team_cc_list):
+    """Merge original CC recipients with the team CC list."""
 
     cc_list = []
 
